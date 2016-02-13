@@ -3,7 +3,61 @@
             [clojure.string :as str]
             [clojure.tools.logging :as log]
             [com.stuartsierra.component :as component]
-            [kosmos.db.c3p0 :as c3p0]))
+            [kosmos.db.hikari :as hikari])
+  (:import [com.zaxxer.hikari HikariDataSource HikariConfig]))
+
+(defn datasource [{:keys [classname jdbc-url user username password pool] :as component}]
+  (let [{:keys [allow-pool-suspension
+                auto-commit
+                catalog
+                connection-init-sql
+                connection-test-query
+                connection-timeout
+                datasource-classname
+                datasource-jndi
+                datasource-properties
+                idle-timeout
+                initialization-fail-fast
+                isolate-internal-queries
+                leak-detection-threshold
+                max-lifetime
+                maximum-pool-size
+                minimum-idle
+                pool-name
+                read-only
+                register-mbeans
+                transaction-isolation
+                validation-timeout
+                ]}                              pool]
+
+    (com.zaxxer.hikari.HikariDataSource.
+     (cond-> (com.zaxxer.hikari.HikariConfig.)
+       allow-pool-suspension    (hikari/allow-pool-suspension allow-pool-suspension)
+       auto-commit              (hikari/auto-commit auto-commit)
+       catalog                  (hikari/catalog catalog)
+       classname                (hikari/classname classname)
+       connection-init-sql      (hikari/connection-init-sql connection-init-sql)
+       connection-test-query    (hikari/connection-test-query connection-test-query)
+       connection-timeout       (hikari/connection-timeout connection-timeout)
+       datasource-classname     (hikari/datasource-classname datasource-classname)
+       datasource-jndi          (hikari/datasource-jndi datasource-jndi)
+       datasource-properties    (hikari/datasource-properties datasource-properties)
+       idle-timeout             (hikari/idle-timeout idle-timeout)
+       initialization-fail-fast (hikari/initialization-fail-fast initialization-fail-fast)
+       isolate-internal-queries (hikari/isolate-internal-queries isolate-internal-queries)
+       jdbc-url                 (hikari/jdbc-url jdbc-url)
+       leak-detection-threshold (hikari/leak-detection-threshold leak-detection-threshold)
+       max-lifetime             (hikari/max-lifetime max-lifetime)
+       maximum-pool-size        (hikari/maximum-pool-size maximum-pool-size)
+       minimum-idle             (hikari/minimum-idle minimum-idle)
+       password                 (hikari/password password)
+       pool-name                (hikari/pool-name pool-name)
+       read-only                (hikari/read-only read-only)
+       register-mbeans          (hikari/register-mbeans register-mbeans)
+       transaction-isolation    (hikari/transaction-isolation transaction-isolation)
+       user                     (hikari/username user)
+       username                 (hikari/username username)
+       validation-timeout       (hikari/validation-timeout validation-timeout)))))
 
 (defn query-string [params]
   (when (seq params)
@@ -13,23 +67,31 @@
 
   component/Lifecycle
 
-  (start [{:keys [classname subprotocol subname host port database user password params]
-           :or {host "localhost" port 3306}
+  (start [{:keys [classname subprotocol subname host port database user username password params pool]
            :as component}]
     (try
       (log/info "Starting Database component.")
       (let [subname  (or subname (str "//" host (when port (str ":" port)) "/" database))
-            jdbc-url (str "jdbc:" subprotocol ":" subname (when (seq params) (str "?" (query-string params))))]
+            jdbc-url (str "jdbc:" subprotocol ":" subname (when (seq params) (str "?" (query-string params))))
+            datasource (when pool
+                         (log/info " - constructing database connection pool")
+                         (datasource (merge component
+                                            {:classname classname
+                                             :jdbc-url jdbc-url
+                                             :user user
+                                             :username username
+                                             :password password})))]
         (merge
          component
-         {:datasource (c3p0/datasource (merge component {:classname classname :jdbc-url jdbc-url :user user :password password}))
-          :classname classname
+         {:classname classname
           :subprotocol subprotocol
           :subname subname
           :jdbc-url jdbc-url
-          :user user
+          :user (or user username)
           :password password
-          :database database}))
+          :database database}
+         (when pool
+           {:datasource datasource})))
       (catch Exception e
         (log/error "Database is not running or is not accessible with the current settings: "
                    component)
@@ -37,6 +99,7 @@
 
   (stop [component]
     (log/info "Stopping Database component.")
-    (when-let [pool (:datasource component)]
-      (.close ^com.mchange.v2.c3p0.ComboPooledDataSource pool))
+    (when-let [ds (:datasource component)]
+      (log/info " - closing db connection pool")
+      (.close ds))
     component))
