@@ -1,3 +1,3 @@
-# kosmos-db
+# kosmos-hikari
 
-Simple db component for kosmos that provides c3p0 pooling
+Simple db component for kosmos that provides hikari connection pooling
