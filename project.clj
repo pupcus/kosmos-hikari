@@ -1,10 +1,10 @@
-(defproject kosmos-db "0.0.1-SNAPSHOT"
+(defproject kosmos-hikari "0.0.1-SNAPSHOT"
 
-  :description "pre-ordained system components for use with sql databases"
+  :description "simple jdbc database component with hikari connection pooling"
 
-  :url "https://bitbucket.org/pupcus/kosmos-db"
+  :url "https://bitbucket.org/pupcus/kosmos-hikari"
 
-  :scm {:url "git@bitbucket.org:bitbucket/kosmos-db"}
+  :scm {:url "git@bitbucket.org:bitbucket/kosmos-hikari"}
 
   :dependencies [[kosmos "0.0.2-SNAPSHOT"]
                  [org.clojure/tools.logging "0.3.1"]
