@@ -3,6 +3,7 @@
             [clojure.string :as str]
             [clojure.tools.logging :as log]
             [com.stuartsierra.component :as component]
+            [kosmos.db.util :as u]
             [kosmos.db.hikari :as hikari])
   (:import [com.zaxxer.hikari HikariDataSource HikariConfig]))
 
@@ -59,47 +60,27 @@
        username                 (hikari/username username)
        validation-timeout       (hikari/validation-timeout validation-timeout)))))
 
-(defn query-string [params]
-  (when (seq params)
-    (str/join "&" (map (fn [[k v]] (str (name k) "=" v)) params))))
-
 (defrecord DbComponent []
-
   component/Lifecycle
-
-  (start [{:keys [classname subprotocol subname host port database user username password params pool]
-           :as component}]
+  (start [{:keys [classname subprotocol subname user username password params pool] :as component}]
     (try
       (log/info "Starting Database component.")
-      (let [subname  (or subname (str "//" host (when port (str ":" port)) "/" database))
-            jdbc-url (str "jdbc:" subprotocol ":" subname (when (seq params) (str "?" (query-string params))))
-            datasource (when pool
-                         (log/info " - constructing database connection pool")
-                         (datasource (merge component
-                                            {:classname classname
-                                             :jdbc-url jdbc-url
-                                             :user user
-                                             :username username
-                                             :password password})))]
-        (merge
-         component
-         {:classname classname
-          :subprotocol subprotocol
-          :subname subname
-          :jdbc-url jdbc-url
-          :user (or user username)
-          :password password
-          :database database}
-         (when pool
-           {:datasource datasource})))
+      (let [subname    (or subname (u/build-subname component))
+            jdbc-url   (str "jdbc:" subprotocol ":" subname (when params (u/build-query-string component)))
+            datasource (when pool (datasource (merge component {:jdbc-url jdbc-url})))]
+        (merge component
+               {:jdbc-url jdbc-url
+                :subname  subname
+                :user     (or user username)
+                :username (or username user)
+                :password password}
+               (when datasource
+                 {:datasource datasource})))
       (catch Exception e
-        (log/error "Database is not running or is not accessible with the current settings: "
-                   component)
+        (log/error "Database is not running or is not accessible with the current settings: " component)
         (throw e))))
 
-  (stop [component]
+  (stop [{:keys [datasource] :as component}]
     (log/info "Stopping Database component.")
-    (when-let [ds (:datasource component)]
-      (log/info " - closing db connection pool")
-      (.close ds))
+    (when datasource (.close datasource))
     component))
