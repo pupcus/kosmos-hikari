@@ -6,6 +6,9 @@
 
   :scm {:url "git@bitbucket.org:bitbucket/kosmos-hikari"}
 
+  :license {:name "Eclipse Public License"
+            :url "http://www.eclipse.org/legal/epl-v10.html"}
+
   :dependencies [[kosmos "0.0.2-SNAPSHOT"]
                  [org.clojure/tools.logging "0.3.1"]
                  [org.clojure/java.jdbc "0.4.2"]
