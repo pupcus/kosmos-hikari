@@ -4,7 +4,7 @@
 
   :url "https://bitbucket.org/pupcus/kosmos-hikari"
 
-  :scm {:url "git@bitbucket.org:bitbucket/kosmos-hikari"}
+  :scm {:url "git@bitbucket.org:pupcus/kosmos-hikari"}
 
   :license {:name "Eclipse Public License"
             :url "http://www.eclipse.org/legal/epl-v10.html"}
