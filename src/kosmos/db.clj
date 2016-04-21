@@ -65,8 +65,9 @@
   (start [{:keys [classname subprotocol subname user username password params pool] :as component}]
     (try
       (log/info "Starting Database component.")
-      (let [subname    (or subname (u/build-subname component))
-            jdbc-url   (str "jdbc:" subprotocol ":" subname (when params (u/build-query-string component)))
+      (let [subname    (str (or subname  (str (u/build-subname component)))
+                            (when params (u/build-query-string component)))
+            jdbc-url   (str "jdbc:" subprotocol ":" subname)
             datasource (when pool (datasource (merge component {:jdbc-url jdbc-url})))]
         (merge component
                {:jdbc-url jdbc-url
