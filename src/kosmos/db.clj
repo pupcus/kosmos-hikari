@@ -69,14 +69,18 @@
                             (when params (u/build-query-string component)))
             jdbc-url   (str "jdbc:" subprotocol ":" subname)
             datasource (when pool (datasource (merge component {:jdbc-url jdbc-url})))]
-        (merge component
-               {:jdbc-url jdbc-url
-                :subname  subname
-                :user     (or user username)
-                :username (or username user)
-                :password password}
-               (when datasource
-                 {:datasource datasource})))
+        (with-meta
+          (if datasource
+            {:datasource datasource}
+
+            (merge component
+                   {:jdbc-url jdbc-url
+                    :subname  subname
+                    :user     (or user username)
+                    :username (or username user)
+                    :password password}))
+
+          {:original component}))
       (catch Exception e
         (log/error "Database is not running or is not accessible with the current settings: " component)
         (throw e))))
@@ -84,4 +88,6 @@
   (stop [{:keys [datasource] :as component}]
     (log/info "Stopping Database component.")
     (when datasource (.close datasource))
-    component))
+    (if-let [original (:original (meta component))]
+      original
+      component)))
