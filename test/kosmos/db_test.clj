@@ -58,9 +58,10 @@
                                        " description varchar(255),"
                                        " primary key (id)"
                                        " )")])))
+
     (is (inserted? (jdbc/insert! ds :test {:name "test-01" :description "a test record one"})))
     (is (inserted? (jdbc/insert! ds :test {:name "test-02" :description "a test record two"})))
-    (is (inserted?  (jdbc/insert! ds :test {:name "test-03" :description "a test record three"})))
+    (is (inserted? (jdbc/insert! ds :test {:name "test-03" :description "a test record three"})))
     (is (inserted? (jdbc/insert! ds :test {:name "test-04" :description "a test record four"})))))
 
 (deftest component-without-pooling
