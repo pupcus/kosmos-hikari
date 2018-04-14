@@ -2,9 +2,9 @@
 
   :description "simple jdbc database component with hikari connection pooling"
 
-  :url "https://bitbucket.org/pupcus/kosmos-hikari"
+  :url "https://github.com/pupcus/kosmos-hikari"
 
-  :scm {:url "git@bitbucket.org:pupcus/kosmos-hikari"}
+  :scm {:url "git@github.com:pupcus/kosmos-hikari.git"}
 
   :license {:name "Eclipse Public License"
             :url "http://www.eclipse.org/legal/epl-v10.html"}
