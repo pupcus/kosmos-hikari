@@ -1,4 +1,4 @@
-(defproject kosmos/kosmos-hikari "0.0.5"
+(defproject kosmos/kosmos-hikari "0.0.6-SNAPSHOT"
 
   :description "simple jdbc database component with hikari connection pooling"
 
