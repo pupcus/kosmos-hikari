@@ -9,15 +9,15 @@
   :license {:name "Eclipse Public License"
             :url "http://www.eclipse.org/legal/epl-v10.html"}
 
-  :dependencies [[kosmos "0.0.10"]
-                 [org.clojure/tools.logging "0.5.0"]
-                 [org.clojure/java.jdbc "0.7.10"]
-                 [com.zaxxer/HikariCP "3.4.1"]]
+  :dependencies [[kosmos "0.0.11"]
+                 [org.clojure/tools.logging "0.6.0"]
+                 [org.clojure/java.jdbc "0.7.11"]
+                 [com.zaxxer/HikariCP "3.4.2"]]
 
   :profiles {:dev {:resource-paths ["dev-resources"]
                    :dependencies   [[org.clojure/clojure "1.10.1"]
-                                    [kosmos/kosmos-hsqldb-server "0.0.4"]
-                                    [org.slf4j/slf4j-log4j12 "1.7.25"]]}}
+                                    [kosmos/kosmos-hsqldb-server "0.0.5"]
+                                    [org.slf4j/slf4j-log4j12 "1.7.30"]]}}
 
   :deploy-repositories {"releases" {:url "https://repo.clojars.org" :creds :gpg :sign-releases false}
                         "snapshots" {:url "https://repo.clojars.org" :creds :gpg :sign-releases false}}
