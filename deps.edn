@@ -1,34 +1,23 @@
 {
  :deps
  {
-  kosmos/kosmos {:git/url "https://github.com/pupcus/kosmos.git"
-                 :git/tag "2022-06-28-R2"
-                 :git/sha "1139f6e"}
+  io.github.pupcus/kosmos {:git/tag "2022-06-29-R1"
+                           :git/sha "1d3e828"}
   org.clojure/tools.logging  {:mvn/version "1.2.4"}
   org.clojure/java.jdbc {:mvn/version "0.7.12"}
   com.zaxxer/HikariCP {:mvn/version "5.0.1"}
   }
 
- :paths ["src" "resources"]
+ :paths ["src"]
 
  :aliases
  {
   :dev {:extra-paths ["test" "dev-resources"]
         :extra-deps {
                      org.clojure/clojure {:mvn/version "1.11.1"}
-                     kosmos/kosmos-hsqldb-server {:git/url "https://github.com/pupcus/kosmos-hsqldb-server.git"
-                                                  :git/tag "2022-06-28-R1"
-                                                  :git/sha "f4f89fa"}
+                     io.github.pupcus/kosmos-hsqldb-server {:git/tag "2022-06-29-R1"
+                                                            :git/sha "b0f6f35"}
                      org.slf4j/slf4j-simple {:mvn/version "1.7.36"}
                      org.hsqldb/hsqldb$jdk8 {:mvn/version "2.6.1"}}}
-
-
-  :test {:extra-paths ["test"]
-         :extra-deps {io.github.cognitect-labs/test-runner
-                      {:git/tag "v0.5.1" :git/sha "dfb30dd"}}
-         :main-opts ["-m" "cognitect.test-runner"]
-         :exec-fn cognitect.test-runner.api/test}
-
   }
-
  }
